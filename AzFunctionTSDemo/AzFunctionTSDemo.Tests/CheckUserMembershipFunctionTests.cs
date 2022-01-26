@@ -1,5 +1,5 @@
-﻿using LL.B2CFunctions.Abstractions;
-using LL.B2CFunctions.DTOs;
+﻿using AzFunctionTSDemo.Abstractions;
+using AzFunctionTSDemo.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -10,7 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace LL.B2CFunctions.Tests
+namespace AzFunctionTSDemo.Tests
 {
     public class CheckUserMembershipFunctionTests : BaseTest
     {        
@@ -37,28 +37,28 @@ namespace LL.B2CFunctions.Tests
             yield return new object[]
             {
                 "test membership found",
-                new B2CAttributes() { MembershipNumber = MembershipDetailsTestData[0].membership_number, Email = MembershipDetailsTestData[0].email },
+                new GetMessagesRequestDto() { MembershipNumber = MembershipDetailsTestData[0].MembershipNumber, Email = MembershipDetailsTestData[0].Email },
                 new OkObjectResult(new ContinueResponse())
             };
 
             yield return new object[]
             {
                 "test membership not found",
-                new B2CAttributes() { MembershipNumber = MembershipDetailsTestData[0].membership_number, Email = MembershipDetailsTestData[1].email },
+                new GetMessagesRequestDto() { MembershipNumber = MembershipDetailsTestData[0].MembershipNumber, Email = MembershipDetailsTestData[1].Email },
                 new OkObjectResult(new ErrorResponse(errorText))
             };
 
             yield return new object[]
             {
                 "test invalid request",
-                new B2CAttributes() { MembershipNumber = MembershipDetailsTestData[0].membership_number, Email = MembershipDetailsTestData[1].email },
+                new GetMessagesRequestDto() { MembershipNumber = MembershipDetailsTestData[0].MembershipNumber, Email = MembershipDetailsTestData[1].Email },
                 new OkObjectResult(new ErrorResponse(errorText))
             };
         }
 
         [Theory]
         [MemberData(nameof(GetTestData))]
-        public async Task TestRunCheckUserMembership(string testCase, B2CAttributes req, OkObjectResult expectedResult)
+        public async Task TestRunCheckUserMembership(string testCase, GetMessagesRequestDto req, OkObjectResult expectedResult)
         {
             var actual = await _azFunction.Run(req);
 
@@ -86,7 +86,7 @@ namespace LL.B2CFunctions.Tests
             VerifyServicesCalled(req);
         }
 
-        private void VerifyServicesCalled(B2CAttributes req)
+        private void VerifyServicesCalled(GetMessagesRequestDto req)
         {
             _loggerMock.Verify(x => x.Log(
                 LogLevel.Information,

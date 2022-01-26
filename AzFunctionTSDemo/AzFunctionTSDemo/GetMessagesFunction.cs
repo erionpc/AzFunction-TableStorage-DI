@@ -11,47 +11,38 @@ using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Attributes;
 using Microsoft.OpenApi.Models;
 using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Enums;
 using System.Net;
-using LL.B2CFunctions.DTOs;
-using LL.B2CFunctions.Abstractions;
+using AzFunctionTSDemo.DTOs;
+using AzFunctionTSDemo.Abstractions;
 using System.Linq;
 using System.Collections.Generic;
 
-namespace LL.B2CFunctions
+namespace AzFunctionTSDemo
 {
-    public class CheckUserAppAccessFunction
+    public class GetMessagesFunction
     {
-        private readonly IRolesMembershipsDataService _rolesMembershipsDS;
-        private readonly IRolesDataService _rolesDS;
-        private readonly IRolesAppsDataService _rolesAppsDS;
-        private readonly ILogger<CheckUserAppAccessFunction> _logger;
+        private readonly IOrganisationDataService _organisationDS;
+        private readonly IMessageDataService _messageDS;
+        private readonly ILogger<GetMessagesFunction> _logger;
 
-        public CheckUserAppAccessFunction(IRolesMembershipsDataService rolesMembershipsDS,
-                                          IRolesDataService rolesDS,
-                                          IRolesAppsDataService rolesAppsDS,
-                                          ILogger<CheckUserAppAccessFunction> logger)
+        public GetMessagesFunction(IOrganisationDataService rolesDS,
+                                   IMessageDataService rolesAppsDS,
+                                   ILogger<GetMessagesFunction> logger)
         {
-            _rolesMembershipsDS = rolesMembershipsDS;
-            _rolesDS = rolesDS;
-            _rolesAppsDS = rolesAppsDS;
+            _organisationDS = rolesDS;
+            _messageDS = rolesAppsDS;
             _logger = logger;
         }
 
-        [FunctionName("CheckUserAppAccess")]
-        [OpenApiOperation(operationId: "Run", tags: new[] { "Check user app access" })]
+        [FunctionName("GetMessages")]
+        [OpenApiOperation(operationId: "Run", tags: new[] { "Get messages" })]
         [OpenApiSecurity("function_key", SecuritySchemeType.ApiKey, Name = "code", In = OpenApiSecurityLocationType.Query)]
-        [OpenApiRequestBody(contentType: "text/plain", bodyType: typeof(B2CMembership), Required = true)]
-        [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "text/plain", bodyType: typeof(ContinueResponse), Description = "The user has access to the app")]
+        [OpenApiRequestBody(contentType: "text/plain", bodyType: typeof(GetMessagesRequestDto), Required = true)]
+        [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "text/plain", bodyType: typeof(IEnumerable<MessageDto>), Description = "Messages")]
         public async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "post")] B2CMembership req)
+            [HttpTrigger(AuthorizationLevel.Function, "post")] GetMessagesRequestDto req)
         {
-            _logger.LogInformation("CheckUserAppAccess called");
-
-            // Return error if the request is not valid
-            if (!req.IsValid())
-            {
-                return new OkObjectResult(new ErrorResponse("The request is invalid"));
-            }
-            
+            _logger.LogInformation("GetMessages called");
+                        
             // Return error if the membership number is not linked to any roles
             var roles = await _rolesMembershipsDS.GetRoles(req.MembershipNumber);
             if (!roles.Any())
@@ -63,7 +54,7 @@ namespace LL.B2CFunctions
             List<string?> activeRoles = new();
             foreach (var roleMembership in roles)
             {
-                var role = await _rolesDS.Get(roleMembership.RoleId);
+                var role = await _organisationDS.Get(roleMembership.RoleId);
                 if (role != null)
                 {
                     activeRoles.Add(roleMembership!.RoleId);
@@ -75,7 +66,7 @@ namespace LL.B2CFunctions
             }
 
             // Search the active role(s) for access to the destination app
-            var appRole = await _rolesAppsDS.Get(activeRoles, req.Tenant, req.AppId);
+            var appRole = await _messageDS.Get(activeRoles, req.Tenant, req.AppId);
             
             if (appRole != null)
             {

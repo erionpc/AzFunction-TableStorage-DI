@@ -1,5 +1,5 @@
-﻿using LL.B2CFunctions.Abstractions;
-using LL.B2CFunctions.DTOs;
+﻿using AzFunctionTSDemo.Abstractions;
+using AzFunctionTSDemo.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -10,17 +10,17 @@ using System.Text;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace LL.B2CFunctions.Tests
+namespace AzFunctionTSDemo.Tests
 {
     public class CheckUserAppAccessFunctionTests : BaseTest
     {        
-        private Mock<ILogger<CheckUserAppAccessFunction>> _loggerMock;
-        private readonly CheckUserAppAccessFunction _azFunction;
+        private Mock<ILogger<GetMessagesFunction>> _loggerMock;
+        private readonly GetMessagesFunction _azFunction;
 
         public CheckUserAppAccessFunctionTests()
         {
             MockDependencies();
-            _azFunction = new CheckUserAppAccessFunction(RolesMembershipsDSMock!.Object, RolesDSMock!.Object, RolesAppsDSMock!.Object, _loggerMock!.Object);
+            _azFunction = new GetMessagesFunction(RolesMembershipsDSMock!.Object, RolesDSMock!.Object, RolesAppsDSMock!.Object, _loggerMock!.Object);
         }
 
         protected override void MockDependencies()
@@ -29,66 +29,66 @@ namespace LL.B2CFunctions.Tests
             MockRolesDataService();
             MockRolesAppsDataService();
 
-            _loggerMock = GetMockedILogger<CheckUserAppAccessFunction>();
+            _loggerMock = GetMockedILogger<GetMessagesFunction>();
         }
 
         public static IEnumerable<object[]> GetTestData()
         {
-            var userNotLinkedToAnyRoles = MembershipDetailsTestData.FirstOrDefault(x => !RolesMembershipsTestData.Any(r => r.MembershipNumber == x.membership_number && r.Active == true));
+            var userNotLinkedToAnyRoles = MembershipDetailsTestData.FirstOrDefault(x => !RolesMembershipsTestData.Any(r => r.MembershipNumber == x.MembershipNumber && r.Active == true));
             var userLinkedToNonExistingRole = RolesMembershipsTestData.FirstOrDefault(x => x.Active == true && !RolesTestData.Select(r => r.RowKey).Contains(x.RoleId));
             var userLinkedToInactiveRole = RolesMembershipsTestData.FirstOrDefault(x => x.Active == true && RolesTestData.Where(r => r.Active == false).Select(r => r.RowKey).Contains(x.RoleId));
             var inactiveAccessToApp = RolesAppsTestData.FirstOrDefault(x => x.Active == false);
-            var userWithInactiveAccessToApp = RolesMembershipsTestData.FirstOrDefault(x => x.RoleId == inactiveAccessToApp!.RoleId);
-            var activeAccessToApp = RolesAppsTestData.FirstOrDefault(x => x.Active == true && RolesTestData.Where(r => r.Active == true).Select(r => r.RowKey).Contains(x.RoleId));
-            var userWithAccessToApp = RolesMembershipsTestData.FirstOrDefault(x => x.RoleId == activeAccessToApp!.RoleId);
+            var userWithInactiveAccessToApp = RolesMembershipsTestData.FirstOrDefault(x => x.RoleId == inactiveAccessToApp!.OrganisationId);
+            var activeAccessToApp = RolesAppsTestData.FirstOrDefault(x => x.Active == true && RolesTestData.Where(r => r.Active == true).Select(r => r.RowKey).Contains(x.OrganisationId));
+            var userWithAccessToApp = RolesMembershipsTestData.FirstOrDefault(x => x.RoleId == activeAccessToApp!.OrganisationId);
 
             yield return new object[]
             {
                 "test invalid request",
-                new B2CMembership() { MembershipNumber = MembershipDetailsTestData[0].membership_number, AppId = "", Tenant = RolesAppsTestData[0].Tenant },
+                new MessageDto() { MembershipNumber = MembershipDetailsTestData[0].MembershipNumber, AppId = "", Tenant = RolesAppsTestData[0].Tenant },
                 new OkObjectResult(new ErrorResponse("The request is invalid"))
             };
             yield return new object[]
             {
                 "test user with inactive link to roles",
-                new B2CMembership() { MembershipNumber = userNotLinkedToAnyRoles!.membership_number, AppId = RolesAppsTestData[0].AppId, Tenant = RolesAppsTestData[0].Tenant },
+                new MessageDto() { MembershipNumber = userNotLinkedToAnyRoles!.MembershipNumber, AppId = RolesAppsTestData[0].AppId, Tenant = RolesAppsTestData[0].Tenant },
                 new OkObjectResult(new ErrorResponse("The user is not linked to any roles"))
             };
             yield return new object[]
             {
                 "test user with link to non existing role",
-                new B2CMembership() { MembershipNumber = userLinkedToNonExistingRole!.MembershipNumber, AppId = RolesAppsTestData[0].AppId, Tenant = RolesAppsTestData[0].Tenant },
+                new MessageDto() { MembershipNumber = userLinkedToNonExistingRole!.MembershipNumber, AppId = RolesAppsTestData[0].AppId, Tenant = RolesAppsTestData[0].Tenant },
                 new OkObjectResult(new ErrorResponse("The user is not linked to any roles"))
             };
             yield return new object[]
             {
                 "test user with link to inactive role",
-                new B2CMembership() { MembershipNumber = userLinkedToInactiveRole!.MembershipNumber, AppId = RolesAppsTestData[0].AppId, Tenant = RolesAppsTestData[0].Tenant },
+                new MessageDto() { MembershipNumber = userLinkedToInactiveRole!.MembershipNumber, AppId = RolesAppsTestData[0].AppId, Tenant = RolesAppsTestData[0].Tenant },
                 new OkObjectResult(new ErrorResponse("The user is not linked to any roles"))
             };
             yield return new object[]
             {
                 "test user with inactive access to app",
-                new B2CMembership() { MembershipNumber = userWithInactiveAccessToApp!.MembershipNumber, AppId = inactiveAccessToApp!.AppId, Tenant = inactiveAccessToApp!.Tenant },
+                new MessageDto() { MembershipNumber = userWithInactiveAccessToApp!.MembershipNumber, AppId = inactiveAccessToApp!.AppId, Tenant = inactiveAccessToApp!.Tenant },
                 new OkObjectResult(new ErrorResponse("The user doesn't have access to the app"))
             };
             yield return new object[]
             {
                 "test user with no access to app",
-                new B2CMembership() { MembershipNumber = userWithAccessToApp!.MembershipNumber, AppId = "some value", Tenant = activeAccessToApp!.Tenant },
+                new MessageDto() { MembershipNumber = userWithAccessToApp!.MembershipNumber, AppId = "some value", Tenant = activeAccessToApp!.Tenant },
                 new OkObjectResult(new ErrorResponse("The user doesn't have access to the app"))
             };
             yield return new object[]
             {
                 "test user with access to app",
-                new B2CMembership() { MembershipNumber = userWithAccessToApp!.MembershipNumber, AppId = activeAccessToApp!.AppId, Tenant = activeAccessToApp!.Tenant },
+                new MessageDto() { MembershipNumber = userWithAccessToApp!.MembershipNumber, AppId = activeAccessToApp!.AppId, Tenant = activeAccessToApp!.Tenant },
                 new OkObjectResult(new ContinueResponse())
             };
         }
 
         [Theory]
         [MemberData(nameof(GetTestData))]
-        public async Task TestRunCheckUserAppAccess(string testCase, B2CMembership req, OkObjectResult expectedResult)
+        public async Task TestRunCheckUserAppAccess(string testCase, MessageDto req, OkObjectResult expectedResult)
         {
             var actual = await _azFunction.Run(req);
 
@@ -116,7 +116,7 @@ namespace LL.B2CFunctions.Tests
             VerifyServicesCalled(req, (FunctionResponse)((OkObjectResult)actual).Value);
         }
 
-        private void VerifyServicesCalled(B2CMembership req, FunctionResponse resp)
+        private void VerifyServicesCalled(MessageDto req, FunctionResponse resp)
         {
             _loggerMock.Verify(x => x.Log(
                 LogLevel.Information,

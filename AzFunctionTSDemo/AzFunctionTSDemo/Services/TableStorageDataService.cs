@@ -1,4 +1,4 @@
-﻿using LL.B2CFunctions.Abstractions;
+﻿using AzFunctionTSDemo.Abstractions;
 using Microsoft.Azure.Cosmos.Table;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LL.B2CFunctions.Services
+namespace AzFunctionTSDemo.Services
 {
     public abstract class TableStorageDataService<T> : ITableStorageService<T> where T : TableEntity, new()
     {

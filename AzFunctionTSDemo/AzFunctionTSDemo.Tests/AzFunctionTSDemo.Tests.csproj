@@ -22,7 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\LL.B2CFunctions\LL.B2CFunctions.csproj" />
+    <ProjectReference Include="..\AzFunctionTSDemo\AzFunctionTSDemo.csproj" />
   </ItemGroup>
 
   <ItemGroup>
