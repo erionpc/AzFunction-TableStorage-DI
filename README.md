@@ -1,2 +1,2 @@
 # Introduction 
-This repo contains the custom AAD B2C policies and the Azure Function code for the LL solution
+This repo illustrates how to use dependency injection (instead of bindings) to interact with Azure Table Storage in an Azure Function project using Visual Studio 2022.
