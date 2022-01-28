@@ -8,8 +8,8 @@ using System.Threading.Tasks;
 
 namespace AzFunctionTSDemo.Abstractions
 {
-    public interface IOrganisationDataService : ITableStorageService<Organisation>
+    public interface ICompanyDataService : ITableStorageService<Company>
     {
-        Task<Organisation?> Get(string? organisationId);
+        Task<Company?> Get(string? companyId);
     }
 }

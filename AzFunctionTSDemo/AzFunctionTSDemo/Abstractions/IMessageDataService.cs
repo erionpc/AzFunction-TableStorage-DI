@@ -10,8 +10,7 @@ namespace AzFunctionTSDemo.Abstractions
 {
     public interface IMessageDataService : ITableStorageService<Message>
     {
-        Task<IEnumerable<Message>> Get(string fromOrganisationId,
-                                       string? toOrganisationId,
+        Task<IEnumerable<Message>> Get(string? companyId,
                                        DateTimeOffset? fromTime,
                                        DateTimeOffset? toTime,
                                        bool? processed);

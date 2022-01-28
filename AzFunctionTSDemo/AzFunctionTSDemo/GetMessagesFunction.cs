@@ -1,35 +1,35 @@
-using System;
-using System.IO;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Attributes;
 using Microsoft.OpenApi.Models;
 using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Enums;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 using System.Net;
+
 using AzFunctionTSDemo.DTOs;
 using AzFunctionTSDemo.Abstractions;
-using System.Linq;
-using System.Collections.Generic;
 
 namespace AzFunctionTSDemo
 {
     public class GetMessagesFunction
     {
-        private readonly IOrganisationDataService _organisationDS;
+        private readonly ICompanyDataService _companyDS;
         private readonly IMessageDataService _messageDS;
         private readonly ILogger<GetMessagesFunction> _logger;
 
-        public GetMessagesFunction(IOrganisationDataService rolesDS,
-                                   IMessageDataService rolesAppsDS,
+        public GetMessagesFunction(ICompanyDataService companyDS,
+                                   IMessageDataService messageDS,
                                    ILogger<GetMessagesFunction> logger)
         {
-            _organisationDS = rolesDS;
-            _messageDS = rolesAppsDS;
+            _companyDS = companyDS;
+            _messageDS = messageDS;
             _logger = logger;
         }
 
@@ -42,40 +42,24 @@ namespace AzFunctionTSDemo
             [HttpTrigger(AuthorizationLevel.Function, "post")] GetMessagesRequestDto req)
         {
             _logger.LogInformation("GetMessages called");
-                        
-            // Return error if the membership number is not linked to any roles
-            var roles = await _rolesMembershipsDS.GetRoles(req.MembershipNumber);
-            if (!roles.Any())
+
+            var messages = await _messageDS.Get(req.CompanyId, req.FromTime, req.ToTime, req.Processed);
+            if (!messages.Any())
             {
-                return new OkObjectResult(new ErrorResponse("The user is not linked to any roles"));
+                return new OkObjectResult(null);
             }
 
-            // Return error if the membership number is not linked to any active roles
-            List<string?> activeRoles = new();
-            foreach (var roleMembership in roles)
+            List<MessageDto> messagesFound = new();
+            foreach (var message in messages)
             {
-                var role = await _organisationDS.Get(roleMembership.RoleId);
-                if (role != null)
+                var company = await _companyDS.Get(message.CompanyId);
+                if (company?.Active == true)
                 {
-                    activeRoles.Add(roleMembership!.RoleId);
-                }
-            }
-            if (!activeRoles.Any())
-            {
-                return new OkObjectResult(new ErrorResponse("The user is not linked to any roles"));
+                    messagesFound.Add(new MessageDto(message));
+                }    
             }
 
-            // Search the active role(s) for access to the destination app
-            var appRole = await _messageDS.Get(activeRoles, req.Tenant, req.AppId);
-            
-            if (appRole != null)
-            {
-                return new OkObjectResult(new ContinueResponse());
-            }
-            else
-            {
-                return new OkObjectResult(new ErrorResponse("The user doesn't have access to the app"));
-            }
+            return new OkObjectResult(messagesFound);
         }
     }
 }

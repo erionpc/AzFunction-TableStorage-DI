@@ -9,10 +9,9 @@ namespace AzFunctionTSDemo.DTOs
 {
     public sealed class GetMessagesRequestDto
     {
-        public string? FromOrganisationId { get; set; }
-        public string? ToOrganisationId { get; set; }
-        public bool? Processed { get; set; }
+        public string? CompanyId { get; set; }
         public DateTimeOffset? FromTime { get; set; }
         public DateTimeOffset? ToTime { get; set; }
+        public bool? Processed { get; set; }
     }
 }

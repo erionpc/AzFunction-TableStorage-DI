@@ -15,55 +15,34 @@ using System.Threading.Tasks;
 
 namespace AzFunctionTSDemo.Tests
 {
-    public abstract class BaseTest
+    public class BaseTest
     {
         protected static string AppSettingsFileName => "appsettings.test.json";
 
-        protected static readonly List<MembershipDetails> MembershipDetailsTestData = new()
+        protected static readonly List<Company> CompanyTestData = new()
         {
-            new MembershipDetails() { MembershipNumber = "1", Email = "testuser1@email.com" },
-            new MembershipDetails() { MembershipNumber = "2", Email = "testuser2@email.com" },
-            new MembershipDetails() { MembershipNumber = "3", Email = "testuser3@email.com" },
-            new MembershipDetails() { MembershipNumber = "4", Email = "testuser4@email.com" },
-            new MembershipDetails() { MembershipNumber = "5", Email = "testuser5@email.com" }
+            new Company() { RowKey = "1", Name = "Company1", Active = true },
+            new Company() { RowKey = "2", Name = "Company2", Active = true },
+            new Company() { RowKey = "3", Name = "Role3", Active = false }
         };
 
-        protected static readonly List<Organisation> RolesTestData = new()
+        protected static readonly List<Message> MessagesTestData = new()
         {
-            new Organisation() { RowKey = "1", Name = "Role1", Active = true },
-            new Organisation() { RowKey = "2", Name = "Role2", Active = true },
-            new Organisation() { RowKey = "3", Name = "Role3", Active = false }
-        };
-
-        protected static readonly List<Message> RolesAppsTestData = new()
-        {
-            new Message() { OrganisationId = "1", Tenant = "devtenant.onmicrosoft.com", AppId = "4f8242de-6291-4dcb-9aca-e021981710dc", Active = true },
-            new Message() { OrganisationId = "1", Tenant = "uattenant.onmicrosoft.com", AppId = "0edaef3f-8b75-44b8-be2b-2a5e2e74a759", Active = true },
-            new Message() { OrganisationId = "1", Tenant = "prodtenant.onmicrosoft.com", AppId = "7770a5d0-7c1d-4008-831c-efb6b591e42e", Active = true },
-            new Message() { OrganisationId = "2", Tenant = "devtenant.onmicrosoft.com", AppId = "7c08da3c-8808-4c3e-9196-7adbaa72e9bf", Active = true },
-            new Message() { OrganisationId = "2", Tenant = "uattenant.onmicrosoft.com", AppId = "82415132-9153-4413-aabe-b60336104f19", Active = true },
-            new Message() { OrganisationId = "2", Tenant = "prodtenant.onmicrosoft.com", AppId = "2fbef7e6-c825-4623-b7b5-25c7e4cb25a7", Active = false },
-            new Message() { OrganisationId = "3", Tenant = "devtenant.onmicrosoft.com", AppId = "c780c845-d49c-4d54-973c-97ce84c85a57", Active = true },
-            new Message() { OrganisationId = "3", Tenant = "uattenant.onmicrosoft.com", AppId = "e89da21f-14b4-4265-bfd5-663f785c62d9", Active = true },
-            new Message() { OrganisationId = "3", Tenant = "prodtenant.onmicrosoft.com", AppId = "fcfd16dd-9559-49df-92e4-477102a0b9f2", Active = false },
-        };
-
-        protected static readonly List<RolesMemberships> RolesMembershipsTestData = new()
-        {
-            new RolesMemberships() { RoleId = "1", MembershipNumber = "1", Active = true },
-            new RolesMemberships() { RoleId = "2", MembershipNumber = "1", Active = true },
-            new RolesMemberships() { RoleId = "5", MembershipNumber = "4", Active = true },
-            new RolesMemberships() { RoleId = "1", MembershipNumber = "2", Active = false },
-            new RolesMemberships() { RoleId = "2", MembershipNumber = "2", Active = true },
-            new RolesMemberships() { RoleId = "3", MembershipNumber = "5", Active = true }
+            new Message() { CompanyId = "1", Content = "sample content 1", Timestamp = DateTimeOffset.Now.AddHours(-1) },
+            new Message() { CompanyId = "1", Content = "sample content 2", Timestamp = DateTimeOffset.Now.AddHours(-2) },
+            new Message() { CompanyId = "1", Content = "sample content 3", Timestamp = DateTimeOffset.Now.AddHours(-0.5) },
+            new Message() { CompanyId = "2", Content = "sample content 4", Timestamp = DateTimeOffset.Now.AddHours(-0.4) },
+            new Message() { CompanyId = "2", Content = "sample content 5", Timestamp = DateTimeOffset.Now.AddHours(-0.3) },
+            new Message() { CompanyId = "2", Content = "sample content 6", Timestamp = DateTimeOffset.Now.AddHours(-0.2) },
+            new Message() { CompanyId = "3", Content = "sample content 7", Timestamp = DateTimeOffset.Now.AddHours(-0.1) },
+            new Message() { CompanyId = "3", Content = "sample content 8", Timestamp = DateTimeOffset.Now.AddHours(-0.7) },
+            new Message() { CompanyId = "3", Content = "sample content 9", Timestamp = DateTimeOffset.Now.AddHours(-0.8) },
         };
 
         protected IConfigurationRoot Configuration { get; }
 
-        protected Mock<IMembershipDetailsDataService>? MembershipDetailsDSMock;
-        protected Mock<IOrganisationDataService>? RolesDSMock;
-        protected Mock<IMessageDataService>? RolesAppsDSMock;
-        protected Mock<IRolesMembershipsDataService>? RolesMembershipsDSMock;
+        protected Mock<ICompanyDataService>? CompanyDSMock;
+        protected Mock<IMessageDataService>? MessageDSMock;
 
         public BaseTest()
         {
@@ -100,51 +79,40 @@ namespace AzFunctionTSDemo.Tests
             return logger;
         }
 
-        protected abstract void MockDependencies();
-
-        protected virtual void MockMembershipDetailsDataService()
+        protected void MockDependencies()
         {
-            MembershipDetailsDSMock = new Mock<IMembershipDetailsDataService>();
-            foreach (var membershipDetails in MembershipDetailsTestData)
+            MockCompanyDataService();
+            MockMessagesDataService();
+        }
+
+        protected void MockCompanyDataService()
+        {
+            CompanyDSMock = new Mock<ICompanyDataService>();
+            foreach (var company in CompanyTestData.Where(r => r.Active == true))
             {
-                MembershipDetailsDSMock.Setup(x => x.Get(membershipDetails.MembershipNumber, membershipDetails.Email))
-                    .ReturnsAsync(membershipDetails);
+                CompanyDSMock.Setup(x => x.Get(company.RowKey))
+                    .ReturnsAsync(company);
             }
         }
 
-        protected void MockRolesDataService()
+        protected void MockMessagesDataService()
         {
-            RolesDSMock = new Mock<IOrganisationDataService>();
-            foreach (var role in RolesTestData.Where(r => r.Active == true))
-            {
-                RolesDSMock.Setup(x => x.Get(role.RowKey))
-                    .ReturnsAsync(role);
-            }
-        }
-
-        protected void MockRolesMembershipsDataService()
-        {
-            RolesMembershipsDSMock = new Mock<IRolesMembershipsDataService>();
-            foreach (var membership in MembershipDetailsTestData)
-            {
-                RolesMembershipsDSMock.Setup(x => x.GetRoles(membership.MembershipNumber))
-                    .ReturnsAsync(RolesMembershipsTestData.Where(r => r.MembershipNumber == membership.MembershipNumber && r.Active == true));
-            }
-        }
-
-        protected void MockRolesAppsDataService()
-        {
-            RolesAppsDSMock = new Mock<IMessageDataService>();
-            foreach (var membershipRoles in RolesMembershipsTestData.Where(m => m.Active == true).GroupBy(m => m.MembershipNumber))
-            {
-                var roles = membershipRoles.Select(m => m.RoleId);
-                var appRoles = RolesAppsTestData.Where(r => r.Active == true && roles.Contains(r.OrganisationId));
-                foreach (var appRole in appRoles)
-                {
-                    RolesAppsDSMock.Setup(x => x.Get(roles, appRole.Tenant, appRole.AppId))
-                        .ReturnsAsync(appRole);
-                }
-            }
+            MessageDSMock = new Mock<IMessageDataService>();
+            
+            MessageDSMock.Setup(x => 
+                x.Get(It.IsAny<string?>(),
+                      It.IsAny<DateTimeOffset?>(), 
+                      It.IsAny<DateTimeOffset?>(), 
+                      It.IsAny<bool?>()))
+                    .ReturnsAsync((string? companyId, 
+                                   DateTimeOffset? fromTime, 
+                                   DateTimeOffset? toTime, 
+                                   bool? processed) => 
+                        MessagesTestData.Where(m => 
+                            !string.IsNullOrWhiteSpace(companyId) ? m.CompanyId == companyId : true &&
+                            fromTime.HasValue ? m.Timestamp >= fromTime : true &&
+                            toTime.HasValue ? m.Timestamp <= toTime : true &&
+                            processed.HasValue ? m.Processed == processed : true));
         }
     }
 }

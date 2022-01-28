@@ -2,7 +2,7 @@
 
 namespace AzFunctionTSDemo.Entities
 {
-    public class Organisation : TableEntity
+    public class Company : TableEntity
     {
         public string? Name { get; set; }
         public string? Description { get; set; }
