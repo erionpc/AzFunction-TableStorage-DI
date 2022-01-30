@@ -1,0 +1,7 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "copy from function config for local use and rename this file to local.settings.json",
+    "FUNCTIONS_WORKER_RUNTIME": "dotnet"
+  }
+}
