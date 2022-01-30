@@ -35,19 +35,19 @@ az storage table create --name Message --account-name {the storage account name}
 
 
 `az storage entity insert --account-name {the storage account name} --table-name Message --entity PartitionKey=a RowKey=1 CompanyId="1" Content="this is the message content 1" Processed=false Processed@odata.type=Edm.Boolean`
-`
+
 `az storage entity insert --account-name {the storage account name} --table-name Message --entity PartitionKey=a RowKey=2 CompanyId="1" Content="this is the message content 2" Processed=true Processed@odata.type=Edm.Boolean`
-`
+
 `az storage entity insert --account-name {the storage account name} --table-name Message --entity PartitionKey=a RowKey=3 CompanyId="1" Content="this is the message content 3" Processed=true Processed@odata.type=Edm.Boolean`
-`
+
 `az storage entity insert --account-name {the storage account name} --table-name Message --entity PartitionKey=a RowKey=4 CompanyId="2" Content="this is the message content 4" Processed=false Processed@odata.type=Edm.Boolean`
-`
+
 `az storage entity insert --account-name {the storage account name} --table-name Message --entity PartitionKey=a RowKey=5 CompanyId="2" Content="this is the message content 5" Processed=false Processed@odata.type=Edm.Boolean`
-`
+
 `az storage entity insert --account-name {the storage account name} --table-name Message --entity PartitionKey=a RowKey=6 CompanyId="2" Content="this is the message content 6" Processed=true Processed@odata.type=Edm.Boolean`
-`
+
 `az storage entity insert --account-name {the storage account name} --table-name Message --entity PartitionKey=a RowKey=7 CompanyId="3" Content="this is the message content 7" Processed=true Processed@odata.type=Edm.Boolean`
-`
+
 `az storage entity insert --account-name {the storage account name} --table-name Message --entity PartitionKey=a RowKey=8 CompanyId="3" Content="this is the message content 8" Processed=false Processed@odata.type=Edm.Boolean`
 
 #### Deploy the Azure function
