@@ -27,6 +27,8 @@ az storage table create --name Message --account-name {the storage account name}
 </code>
 
 #### Insert sample data
+
+##### Sample companies 
 <code>
 az storage entity insert --account-name {the storage account name} --table-name Company --entity PartitionKey=a RowKey=1 Name="Test company 1" Description="bla bla bla" Active=true Active@odata.type=Edm.Boolean
 
@@ -34,6 +36,8 @@ az storage entity insert --account-name {the storage account name} --table-name 
 
 az storage entity insert --account-name {the storage account name} --table-name Company --entity PartitionKey=a RowKey=3 Name="Test company 3" Description="bla bla bla" Active=false Active@odata.type=Edm.Boolean
 </code>
+
+##### Sample messages
 <code>
 az storage entity insert --account-name {the storage account name} --table-name Message --entity PartitionKey=a RowKey=1 CompanyId="1" Content="this is the message content 1" Processed=false Processed@odata.type=Edm.Boolean
 
