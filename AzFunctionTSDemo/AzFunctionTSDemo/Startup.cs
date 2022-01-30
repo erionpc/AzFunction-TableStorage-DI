@@ -21,8 +21,8 @@ namespace AzFunctionTSDemo
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-            builder.Services.AddScoped<IMessageDataService, MessageDataService>();
-            builder.Services.AddScoped<ICompanyDataService, CompanyDataService>();
+            builder.Services.AddTransient<IMessageDataService, MessageDataService>();
+            builder.Services.AddTransient<ICompanyDataService, CompanyDataService>();
         }
     }
 }
