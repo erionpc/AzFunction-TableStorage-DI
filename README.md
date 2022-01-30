@@ -17,7 +17,7 @@ The following folders are used to separate the several areas of the solution:
 - [Entities](AzFunctionTSDemo/AzFunctionTSDemo/Entities): contains the entities that mirror the data in table storage (properties named after the table column names):
 	- [Company](AzFunctionTSDemo/AzFunctionTSDemo/Entities/Company.cs) is the Company entity.
 	- [Message](AzFunctionTSDemo/AzFunctionTSDemo/Entities/Company.cs) is the Message entity.
-- [Services](AzFunctionTSDemo/AzFunctionTSDemo/Services): contains the entities that mirror the data in table storage (properties named after the table column names):
+- [Services](AzFunctionTSDemo/AzFunctionTSDemo/Services): contains the implementation of the data services. There is one data service per table:
 	- [TableStorageDataService](AzFunctionTSDemo/AzFunctionTSDemo/Services/TableStorageDataService.cs) is a generic abstract base class for the data services which defines the implementation of the operations declared in the *ITableStorageService* interface. The concrete data services inherit from this class so that the implementation of the data access is contained only on the base class.
 	- [CompanyDataService](AzFunctionTSDemo/AzFunctionTSDemo/Services/CompanyDataService.cs) is a data service class for accessing data from the *Company* table. It inherits from the *TableStorageDataService* class and all it does is define the filter criteria for getting the data.
 	- [MessageDataService](AzFunctionTSDemo/AzFunctionTSDemo/Services/MessageDataService.cs) is a data service class for accessing data from the *Message* table. It inherits from the *TableStorageDataService* class and all it does is define the filter criteria for getting the data.
