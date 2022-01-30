@@ -1,4 +1,4 @@
-# Azure Function with Table Storage dependency
+# Azure Function with injected Table Storage dependency
 This repo contains a .NET 6 C# solution which illustrates how to use dependency injection (instead of bindings) to interact with Azure Table Storage in an Azure Function project using Visual Studio 2022.
 
 After wasting some time trying to get table bindings working on an Azure Function by following the official documentation, I decided to adopt a more classic ASP.NET web application structure for an Azure Function, with a Startup class and dependency injection. 
@@ -46,6 +46,8 @@ Follow these steps to set up the Azure table storage for this example using Azur
 `az storage table create --name Message --account-name {the storage account name}`
 
 ### Insert sample data
+
+#### Sample companies
 `az storage entity insert --account-name {the storage account name} --table-name Company --entity PartitionKey=a RowKey=1 Name="Test company 1" Description="bla bla bla" Active=true Active@odata.type=Edm.Boolean`
 
 `az storage entity insert --account-name {the storage account name} --table-name Company --entity PartitionKey=a RowKey=2 Name="Test company 2" Description="bla bla bla" Active=true Active@odata.type=Edm.Boolean`
@@ -53,8 +55,7 @@ Follow these steps to set up the Azure table storage for this example using Azur
 `az storage entity insert --account-name {the storage account name} --table-name Company --entity PartitionKey=a RowKey=3 Name="Test company 3" Description="bla bla bla" Active=false Active@odata.type=Edm.Boolean`
 
 
-
-
+#### Sample messages
 `az storage entity insert --account-name {the storage account name} --table-name Message --entity PartitionKey=a RowKey=1 CompanyId="1" Content="this is the message content 1" Processed=false Processed@odata.type=Edm.Boolean`
 
 `az storage entity insert --account-name {the storage account name} --table-name Message --entity PartitionKey=a RowKey=2 CompanyId="1" Content="this is the message content 2" Processed=true Processed@odata.type=Edm.Boolean`
@@ -75,4 +76,4 @@ Follow these steps to set up the Azure table storage for this example using Azur
 Choose your favourite way to deploy the AzFunctionTSDemo function. One of the easiest ways is to do it from Visual Studio once you've configured your Azure Portal account in the Visual Studio Accounts'.
 
 ### Run locally
-Make a copy of the local.settings.rename.json file and rename it to local.settings.json. Go to the deployed Azure Function on the Azure Portal and copy the value of the AzureWebJobsStorage configuration setting. Paste it in the corresponding setting in the local.settings.json file. Run the solution. A terminal window will come up with the solution endpoints. If you go to http://localhost:7071/api/swagger/ui you'll be able to call the Azure Function from the Swagger UI.
+Make a copy of the local.settings.rename.json file and rename it to local.settings.json. Go to the deployed Azure Function on the Azure Portal and copy the value of the AzureWebJobsStorage configuration setting. Paste it in the corresponding setting in the local.settings.json file. Run the solution. A terminal window will come up with the solution endpoints. If you go to https://localhost:7071/api/swagger/ui you'll be able to call the Azure Function from the Swagger UI.
