@@ -20,23 +20,35 @@ Follow these steps to set up the Azure table storage for this example using Azur
 `az storage account create --name {pick a valid acocunt name} --resource-group {choose an existing resource group}`
 
 #### Create tables in the storage account
-`az storage table create --name Company --account-name {the storage account name}`
-`az storage table create --name Message --account-name {the storage account name}`
+<code>
+az storage table create --name Company --account-name {the storage account name}
+
+az storage table create --name Message --account-name {the storage account name}
+</code>
 
 #### Insert sample data
 <code>
 az storage entity insert --account-name {the storage account name} --table-name Company --entity PartitionKey=a RowKey=1 Name="Test company 1" Description="bla bla bla" Active=true Active@odata.type=Edm.Boolean
+
 az storage entity insert --account-name {the storage account name} --table-name Company --entity PartitionKey=a RowKey=2 Name="Test company 2" Description="bla bla bla" Active=true Active@odata.type=Edm.Boolean
+
 az storage entity insert --account-name {the storage account name} --table-name Company --entity PartitionKey=a RowKey=3 Name="Test company 3" Description="bla bla bla" Active=false Active@odata.type=Edm.Boolean
 </code>
 <code>
 az storage entity insert --account-name {the storage account name} --table-name Message --entity PartitionKey=a RowKey=1 CompanyId="1" Content="this is the message content 1" Processed=false Processed@odata.type=Edm.Boolean
+
 az storage entity insert --account-name {the storage account name} --table-name Message --entity PartitionKey=a RowKey=2 CompanyId="1" Content="this is the message content 2" Processed=true Processed@odata.type=Edm.Boolean
+
 az storage entity insert --account-name {the storage account name} --table-name Message --entity PartitionKey=a RowKey=3 CompanyId="1" Content="this is the message content 3" Processed=true Processed@odata.type=Edm.Boolean
+
 az storage entity insert --account-name {the storage account name} --table-name Message --entity PartitionKey=a RowKey=4 CompanyId="2" Content="this is the message content 4" Processed=false Processed@odata.type=Edm.Boolean
+
 az storage entity insert --account-name {the storage account name} --table-name Message --entity PartitionKey=a RowKey=5 CompanyId="2" Content="this is the message content 5" Processed=false Processed@odata.type=Edm.Boolean
+
 az storage entity insert --account-name {the storage account name} --table-name Message --entity PartitionKey=a RowKey=6 CompanyId="2" Content="this is the message content 6" Processed=true Processed@odata.type=Edm.Boolean
+
 az storage entity insert --account-name {the storage account name} --table-name Message --entity PartitionKey=a RowKey=7 CompanyId="3" Content="this is the message content 7" Processed=true Processed@odata.type=Edm.Boolean
+
 az storage entity insert --account-name {the storage account name} --table-name Message --entity PartitionKey=a RowKey=8 CompanyId="3" Content="this is the message content 8" Processed=false Processed@odata.type=Edm.Boolean
 </code>
 
